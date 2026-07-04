@@ -16,6 +16,11 @@ from sklearn.metrics import (
     classification_report,
     confusion_matrix,
 )
+# Set experiment (remove conflicting tracking URI)
+#mlflow.set_tracking_uri("http://127.0.0.1:5000")
+os.makedirs("./mlflow_artifacts", exist_ok=True)
+mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI", "sqlite:///mlflow.db"))
+mlflow.set_experiment("Logistic_Regression_Experiment")
 
 # Load data
 CSV_PATH = Path(__file__).resolve().parent.parent / "data_clean.csv"
@@ -30,11 +35,7 @@ CSV_PATH = Path(__file__).resolve().parent.parent / "data_clean.csv"
     vectorizer,
 ) = prepare_data(CSV_PATH)
 
-# Set experiment (remove conflicting tracking URI)
-#mlflow.set_tracking_uri("http://127.0.0.1:5000")
-os.makedirs("./mlflow_artifacts", exist_ok=True)
-mlflow.set_tracking_uri(f"file:{os.path.abspath('./mlflow_artifacts')}")
-mlflow.set_experiment("Logistic_Regression_Experiment")
+
 
 with mlflow.start_run():
     try:

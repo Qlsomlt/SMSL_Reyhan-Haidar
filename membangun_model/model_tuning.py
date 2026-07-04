@@ -6,7 +6,7 @@ import mlflow.sklearn
 
 #mlflow.set_tracking_uri("http://127.0.0.1:5000")
 os.makedirs("./mlflow_artifacts", exist_ok=True)
-mlflow.set_tracking_uri(f"file:{os.path.abspath('./mlflow_artifacts')}")
+mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI", "sqlite:///mlflow.db"))
 mlflow.set_experiment("Logistic_Regression_Tuning")
 
 from sklearn.linear_model import LogisticRegression
