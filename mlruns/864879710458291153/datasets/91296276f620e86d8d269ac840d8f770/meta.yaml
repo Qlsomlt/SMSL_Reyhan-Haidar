@@ -1,9 +1,0 @@
-digest: 7082583d
-name: dataset
-profile: '{"features_shape": [759, 20000], "features_size": 15180000, "features_nbytes":
-  121440000}'
-schema: '{"mlflow_tensorspec": {"features": "[{\"type\": \"tensor\", \"tensor-spec\":
-  {\"dtype\": \"float64\", \"shape\": [-1, 20000]}}]", "targets": null}}'
-source: '{"tags": {"mlflow.user": "haida", "mlflow.source.name": "D:\\porto\\project\\SMSL_Reyhan-Haidar\\membangun_model\\model.py",
-  "mlflow.source.type": "LOCAL", "mlflow.source.git.commit": "579b66d014833c652ee8a2ff89d6db3d08ea4c84"}}'
-source_type: code

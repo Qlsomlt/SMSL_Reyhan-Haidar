@@ -8,6 +8,9 @@ from preprocessing_data.preprocessing import prepare_data
 
 from sklearn.linear_model import LogisticRegression
 
+import mlflow
+
+mlflow.set_tracking_uri("http://127.0.0.1:5000")
 
 from sklearn.metrics import (
     accuracy_score,
@@ -30,8 +33,6 @@ CSV_PATH = Path(__file__).resolve().parent.parent / "data_clean.csv"
     y_test,
     vectorizer,
 ) = prepare_data(CSV_PATH)
-
-mlflow.sklearn.autolog()
 
 
 # Set experiment

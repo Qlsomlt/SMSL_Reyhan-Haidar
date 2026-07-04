@@ -3,6 +3,9 @@ from pathlib import Path
 import mlflow
 import mlflow.sklearn
 
+mlflow.set_tracking_uri("http://127.0.0.1:5000")
+mlflow.set_experiment("Logistic_Regression_Tuning")
+
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import (
@@ -15,6 +18,7 @@ from sklearn.metrics import (
 )
 
 from preprocessing_data import prepare_data
+
 
 
 
@@ -33,12 +37,10 @@ CSV_PATH = Path(__file__).resolve().parent.parent / "data_clean.csv"
     vectorizer,
 ) = prepare_data(CSV_PATH)
 
-mlflow.sklearn.autolog()
-
 # =====================================
 # MLflow Experiment
 # =====================================
-mlflow.set_experiment("Logistic_Regression_Tuning")
+
 
 # =====================================
 # Hyperparameter Grid
