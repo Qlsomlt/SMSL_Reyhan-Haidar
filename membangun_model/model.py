@@ -7,6 +7,10 @@ import mlflow.sklearn
 from preprocessing_data.preprocessing import prepare_data
 
 from sklearn.linear_model import LogisticRegression
+
+mlflow.set_tracking_uri("sqlite:///mlflow.db")
+mlflow.set_experiment("Logistic_Regression_Experiment")
+
 from sklearn.metrics import (
     accuracy_score,
     precision_score,

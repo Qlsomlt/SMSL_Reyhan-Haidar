@@ -16,6 +16,9 @@ from sklearn.metrics import (
 
 from preprocessing_data import prepare_data
 
+mlflow.set_tracking_uri("sqlite:///mlflow.db")
+mlflow.set_experiment("Logistic_Regression_Experiment")
+
 # =====================================
 # Load data
 # =====================================
