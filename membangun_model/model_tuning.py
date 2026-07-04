@@ -105,7 +105,7 @@ with mlflow.start_run():
 
     mlflow.sklearn.log_model(
         sk_model=best_model,
-        artifact_path="best_logistic_regression_model",
+        artifact_path="models/logistic_regression_model_tuning",
     )
 
     print("\n" + "=" * 60)

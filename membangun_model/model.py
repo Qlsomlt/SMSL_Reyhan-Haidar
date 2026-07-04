@@ -74,7 +74,7 @@ with mlflow.start_run():
         # Log model
         mlflow.sklearn.log_model(
             sk_model=model,
-            artifact_path="logistic_regression_model"
+            artifact_path="models/logistic_regression_model"
         )
 
         # Print results
