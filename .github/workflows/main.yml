@@ -1,0 +1,41 @@
+name: Machine Learning Pipeline
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  train:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.13"
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Download NLTK
+      run: |
+        python -c "import nltk; nltk.download('vader_lexicon')"
+
+    - name: Train Base Model
+      run: |
+        python -m membangun_model.model
+
+    - name: Train Tuned Model
+      run: |
+        python -m membangun_model.model_tuning
+
+    - name: Upload MLflow Results
+      uses: actions/upload-artifact@v4
+      with:
+        name: mlruns
+        path: mlruns/
