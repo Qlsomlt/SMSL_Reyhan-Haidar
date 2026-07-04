@@ -1,6 +1,8 @@
-from pathlib import Path
+import json
 import os
+from pathlib import Path
 
+import joblib
 import pandas as pd
 
 import mlflow
@@ -21,6 +23,13 @@ from sklearn.metrics import (
 os.makedirs("./mlflow_artifacts", exist_ok=True)
 mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI", "sqlite:///mlflow.db"))
 mlflow.set_experiment("Logistic_Regression_Experiment")
+
+# Local artifact output paths
+ARTIFACT_DIR = Path(__file__).resolve().parent / "artifacts"
+ARTIFACT_DIR.mkdir(exist_ok=True)
+MODEL_PATH = ARTIFACT_DIR / "logistic_regression_model.pkl"
+METRICS_PATH = ARTIFACT_DIR / "metrics.json"
+PREDICTIONS_PATH = ARTIFACT_DIR / "predictions.csv"
 
 # Load data
 CSV_PATH = Path(__file__).resolve().parent.parent / "data_clean.csv"
@@ -74,6 +83,28 @@ with mlflow.start_run():
         mlflow.log_metric("recall", recall)
         mlflow.log_metric("f1_score", f1)
 
+        # Save locally for reuse
+        model_payload = {
+            "model": model,
+            "vectorizer": vectorizer,
+            "classes": model.classes_.tolist(),
+        }
+        joblib.dump(model_payload, MODEL_PATH)
+
+        metrics_payload = {
+            "accuracy": float(accuracy),
+            "precision": float(precision),
+            "recall": float(recall),
+            "f1_score": float(f1),
+        }
+        METRICS_PATH.write_text(json.dumps(metrics_payload, indent=2), encoding="utf-8")
+
+        predictions_df = pd.DataFrame({
+            "actual": y_test,
+            "predicted": y_pred,
+        })
+        predictions_df.to_csv(PREDICTIONS_PATH, index=False)
+
         # Log model
         mlflow.sklearn.log_model(
             sk_model=model,
@@ -96,6 +127,9 @@ with mlflow.start_run():
         print(confusion_matrix(y_test, y_pred))
         print("=" * 60)
 
+        print(f"Saved model: {MODEL_PATH}")
+        print(f"Saved metrics: {METRICS_PATH}")
+        print(f"Saved predictions: {PREDICTIONS_PATH}")
         print(f"MLflow Run ID: {mlflow.active_run().info.run_id}")
         
     except Exception as e:

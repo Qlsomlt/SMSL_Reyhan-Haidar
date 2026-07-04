@@ -1,5 +1,6 @@
-from pathlib import Path
 import os
+import pickle
+from pathlib import Path
 
 import mlflow
 import mlflow.sklearn
@@ -8,6 +9,10 @@ import mlflow.sklearn
 os.makedirs("./mlflow_artifacts", exist_ok=True)
 mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI", "sqlite:///mlflow.db"))
 mlflow.set_experiment("Logistic_Regression_Tuning")
+
+ARTIFACT_DIR = Path(__file__).resolve().parent / "artifacts"
+ARTIFACT_DIR.mkdir(exist_ok=True)
+MODEL_PKL_PATH = ARTIFACT_DIR / "best_logistic_regression_model.pkl"
 
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import GridSearchCV
@@ -129,6 +134,9 @@ with mlflow.start_run():
     print("\nConfusion Matrix")
     print(confusion_matrix(y_test, y_pred))
 
-    print("=" * 60)
+    with MODEL_PKL_PATH.open("wb") as f:
+        pickle.dump(best_model, f)
 
+    print("=" * 60)
+    print(f"Saved model to: {MODEL_PKL_PATH}")
     print(f"MLflow Run ID : {mlflow.active_run().info.run_id}")
