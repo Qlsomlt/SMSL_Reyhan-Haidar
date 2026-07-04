@@ -15,7 +15,7 @@ jobs:
 
     - uses: actions/setup-python@v5
       with:
-        python-version: "3.13"
+        python-version: "3.10"
 
     - name: Install Dependencies
       run: |
@@ -42,11 +42,11 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: mlruns
-        path: mlruns/
+
     - name: Upload MLflow Results
       uses: actions/upload-artifact@v4
       with:
         name: mlflow-artifacts
         path: |
-          mlruns/
+
           mlflow.db
