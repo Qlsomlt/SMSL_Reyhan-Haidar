@@ -3,7 +3,7 @@ from pathlib import Path
 import mlflow
 import mlflow.sklearn
 
-mlflow.set_tracking_uri("http://127.0.0.1:5000")
+#mlflow.set_tracking_uri("http://127.0.0.1:5000")
 mlflow.set_tracking_uri("sqlite:///mlflow.db")
 mlflow.set_experiment("Logistic_Regression_Tuning")
 
