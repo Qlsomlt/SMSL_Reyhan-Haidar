@@ -21,11 +21,7 @@ from sklearn.metrics import (
     confusion_matrix,
 )
 
-dagshub.init(repo_owner='Qlsomlt', repo_name='SMSL_Reyhan-Haidar', mlflow=True)
 
-
-
-print("Tracking URI:", mlflow.get_tracking_uri())
 
 # =====================================
 # Path Configuration
@@ -37,6 +33,8 @@ ARTIFACT_DIR.mkdir(exist_ok=True)
 
 CSV_PATH = BASE_DIR / "data_clean.csv"
 MODEL_PKL_PATH = ARTIFACT_DIR / "logistic_regression_model.pkl"
+
+dagshub.init(repo_owner='Qlsomlt', repo_name='SMSL_Reyhan-Haidar', mlflow=True)
 
 # =====================================
 # Load Data
@@ -50,12 +48,6 @@ MODEL_PKL_PATH = ARTIFACT_DIR / "logistic_regression_model.pkl"
     y_test,
     vectorizer,
 ) = prepare_data(CSV_PATH)
-
-# =====================================
-# Clean MLflow Env (avoid conflicts)
-# =====================================
-os.environ.pop("MLFLOW_RUN_ID", None)
-os.environ.pop("MLFLOW_PARENT_RUN_ID", None)
 
 # =====================================
 # Hyperparameter Grid
