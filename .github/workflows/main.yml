@@ -41,6 +41,7 @@ jobs:
           MLFLOW_TRACKING_URI: "https://dagshub.com/Qlsomlt/SMSL_Reyhan-Haidar.mlflow"
           PYTHONPATH:
         run: |
+          cd ${{ github.workspace }}
           python membangun_model/model.py
           python membangun_model/model_tuning.py
 
