@@ -21,6 +21,8 @@ from sklearn.metrics import (
     confusion_matrix,
 )
 
+dagshub.init(repo_owner='Qlsomlt', repo_name='SMSL_Reyhan-Haidar', mlflow=True)
+
 # =========================
 # PATH SETUP
 # =========================
