@@ -20,6 +20,8 @@ from sklearn.metrics import (
     confusion_matrix,
 )
 
+dagshub.init(repo_owner='Qlsomlt', repo_name='SMSL_Reyhan-Haidar', mlflow=True)
+
 # Optional manual override (safe fallback)
 mlflow.set_tracking_uri(
     "https://dagshub.com/Qlsomlt/SMSL_Reyhan-Haidar.mlflow"
@@ -32,9 +34,9 @@ print("Tracking URI:", mlflow.get_tracking_uri())
 # =====================================
 # Path Configuration
 # =====================================
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 
-ARTIFACT_DIR = BASE_DIR / "artifacts"
+ARTIFACT_DIR = BASE_DIR / "membangun_model" / "artifacts"
 ARTIFACT_DIR.mkdir(exist_ok=True)
 
 CSV_PATH = BASE_DIR / "data_clean.csv"

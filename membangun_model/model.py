@@ -24,15 +24,17 @@ from sklearn.metrics import (
 # =========================
 # PATH SETUP
 # =========================
-BASE_DIR = Path(__file__).resolve().parent
+# Mendapatkan root direktori (satu tingkat di atas folder membangun_model)
+BASE_DIR = Path(__file__).resolve().parent.parent 
 
-ARTIFACT_DIR = BASE_DIR / "artifacts"
+ARTIFACT_DIR = BASE_DIR / "membangun_model" / "artifacts"
 ARTIFACT_DIR.mkdir(exist_ok=True)
 
 MODEL_PATH = ARTIFACT_DIR / "logistic_regression_model.pkl"
 METRICS_PATH = ARTIFACT_DIR / "metrics.json"
 PREDICTIONS_PATH = ARTIFACT_DIR / "predictions.csv"
 
+# Sekarang mengarah ke data_clean.csv di root directory
 CSV_PATH = BASE_DIR / "data_clean.csv"
 
 mlflow.set_tracking_uri(
