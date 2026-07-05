@@ -35,9 +35,6 @@ PREDICTIONS_PATH = ARTIFACT_DIR / "predictions.csv"
 
 CSV_PATH = BASE_DIR / "data_clean.csv"
 
-
-
-
 mlflow.set_tracking_uri(
     "https://dagshub.com/Qlsomlt/SMSL-Reyhan-Haidar.mlflow"
 )
