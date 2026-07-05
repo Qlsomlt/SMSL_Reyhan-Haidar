@@ -21,7 +21,11 @@ from sklearn.metrics import (
     confusion_matrix,
 )
 
-
+if "MLFLOW_TRACKING_URI" in os.environ:
+    print("Detected MLFLOW_TRACKING_URI, skipping dagshub.init()")
+else:
+    # Hanya lakukan init jika tidak ada env var (misal saat running lokal)
+    dagshub.init(repo_owner='Qlsomlt', repo_name='SMSL_Reyhan-Haidar', mlflow=True)
 
 # =====================================
 # Path Configuration
@@ -34,7 +38,7 @@ ARTIFACT_DIR.mkdir(exist_ok=True)
 CSV_PATH = BASE_DIR / "data_clean.csv"
 MODEL_PKL_PATH = ARTIFACT_DIR / "logistic_regression_model.pkl"
 
-dagshub.init(repo_owner='Qlsomlt', repo_name='SMSL_Reyhan-Haidar', mlflow=True)
+
 
 # =====================================
 # Load Data
