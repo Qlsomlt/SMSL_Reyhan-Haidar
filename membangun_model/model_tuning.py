@@ -1,18 +1,15 @@
+import json
 import os
-import pickle
 from pathlib import Path
 
+import dagshub
+import joblib
 import mlflow
 import mlflow.sklearn
+import pandas as pd
+import pickle
 
-#mlflow.set_tracking_uri("http://127.0.0.1:5000")
-os.makedirs("./mlflow_artifacts", exist_ok=True)
-mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI", "sqlite:///mlflow.db"))
-mlflow.set_experiment("Logistic_Regression_Tuning")
-
-ARTIFACT_DIR = Path(__file__).resolve().parent / "artifacts"
-ARTIFACT_DIR.mkdir(exist_ok=True)
-MODEL_PKL_PATH = ARTIFACT_DIR / "best_logistic_regression_model.pkl"
+from preprocessing_data.preprocessing import prepare_data
 
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import GridSearchCV
@@ -25,16 +22,29 @@ from sklearn.metrics import (
     confusion_matrix,
 )
 
-from preprocessing_data import prepare_data
+# Optional manual override (safe fallback)
+mlflow.set_tracking_uri(
+    "https://dagshub.com/Qlsomlt/SMSL-Reyhan-Haidar.mlflow"
+)
 
+mlflow.set_experiment("Logistic_Regression_Experiment_Tuning")
 
-
+print("Tracking URI:", mlflow.get_tracking_uri())
 
 # =====================================
-# Load data
+# Path Configuration
 # =====================================
-CSV_PATH = Path(__file__).resolve().parent.parent / "data_clean.csv"
+BASE_DIR = Path(__file__).resolve().parent
 
+ARTIFACT_DIR = BASE_DIR / "artifacts"
+ARTIFACT_DIR.mkdir(exist_ok=True)
+
+CSV_PATH = BASE_DIR / "data_clean.csv"
+MODEL_PKL_PATH = ARTIFACT_DIR / "logistic_regression_model.pkl"
+
+# =====================================
+# Load Data
+# =====================================
 (
     X_train,
     X_val,
@@ -46,9 +56,10 @@ CSV_PATH = Path(__file__).resolve().parent.parent / "data_clean.csv"
 ) = prepare_data(CSV_PATH)
 
 # =====================================
-# MLflow Experiment
+# Clean MLflow Env (avoid conflicts)
 # =====================================
-
+os.environ.pop("MLFLOW_RUN_ID", None)
+os.environ.pop("MLFLOW_PARENT_RUN_ID", None)
 
 # =====================================
 # Hyperparameter Grid
@@ -60,7 +71,7 @@ param_grid = {
 }
 
 # =====================================
-# Start MLflow Run
+# MLflow Run
 # =====================================
 with mlflow.start_run():
 
@@ -87,20 +98,20 @@ with mlflow.start_run():
     print("\nBest Parameters")
     print(grid_search.best_params_)
 
-    print(f"Best CV Accuracy : {grid_search.best_score_:.4f}")
+    print(f"Best CV Accuracy: {grid_search.best_score_:.4f}")
 
     # =====================================
-    # Test Evaluation
+    # TEST EVALUATION
     # =====================================
     y_pred = best_model.predict(X_test)
 
     accuracy = accuracy_score(y_test, y_pred)
-    precision = precision_score(y_test, y_pred, average="weighted")
-    recall = recall_score(y_test, y_pred, average="weighted")
-    f1 = f1_score(y_test, y_pred, average="weighted")
+    precision = precision_score(y_test, y_pred, average="weighted", zero_division=0)
+    recall = recall_score(y_test, y_pred, average="weighted", zero_division=0)
+    f1 = f1_score(y_test, y_pred, average="weighted", zero_division=0)
 
     # =====================================
-    # MLflow Logging
+    # MLflow LOGGING
     # =====================================
     mlflow.log_params(grid_search.best_params_)
 
@@ -112,9 +123,12 @@ with mlflow.start_run():
 
     mlflow.sklearn.log_model(
         sk_model=best_model,
-        artifact_path="best_logistic_regression_model",
+        artifact_path="logistic_regression_model",
     )
 
+    # =====================================
+    # PRINT RESULTS
+    # =====================================
     print("\n" + "=" * 60)
     print("GRID SEARCH RESULT")
     print("=" * 60)
@@ -134,6 +148,9 @@ with mlflow.start_run():
     print("\nConfusion Matrix")
     print(confusion_matrix(y_test, y_pred))
 
+    # =====================================
+    # SAVE MODEL LOCALLY
+    # =====================================
     with MODEL_PKL_PATH.open("wb") as f:
         pickle.dump(best_model, f)
 

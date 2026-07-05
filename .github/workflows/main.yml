@@ -30,28 +30,98 @@ jobs:
         run: |
           python -c "import nltk; nltk.download('vader_lexicon')"
 
-      - name: Train Base Model
+      # Step ini menggantikan proses training lokal (sqlite) ke DagsHub
+      - name: Run MLTraining and Model Tuning
+        shell: bash -l {0}
         env:
-          MLFLOW_TRACKING_URI: sqlite:///mlflow.db
+          DAGSHUB_USERNAME: ${{ secrets.DAGSHUB_USERNAME }}
+          DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
+          MLFLOW_TRACKING_USERNAME: ${{ secrets.DAGSHUB_USERNAME }}
+          MLFLOW_TRACKING_PASSWORD: ${{ secrets.DAGSHUB_TOKEN }}
+          MLFLOW_TRACKING_URI: "https://dagshub.com/Qlsomlt/SMSL-Reyhan-Haidar.mlflow"
         run: |
-          python -m membangun_model.model
+          python MLproject/model.py
+          python MLproject/model_tuning.py
 
-      - name: Train Tuned Model
-        env:
-          MLFLOW_TRACKING_URI: sqlite:///mlflow.db
-        run: |
-          python -m membangun_model.model_tuning
-
-      - name: Upload MLflow Database
+      - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: mlflow-db
-          path: mlflow.db
+          name: model-artifacts
+          path: MLproject/artifacts
 
-      - name: Upload MLflow Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: mlflow-artifacts
-          path: |
-            mlartifacts/
-            mlruns/
+      - name: Get Latest MLflow Run ID
+        shell: bash -l {0}
+        env:
+          MLFLOW_TRACKING_USERNAME: ${{ secrets.DAGSHUB_USERNAME }}
+          MLFLOW_TRACKING_PASSWORD: ${{ secrets.DAGSHUB_TOKEN }}
+        run: |
+          python - <<'EOF'
+          import mlflow
+          from mlflow.tracking import MlflowClient
+          import time
+          
+          mlflow.set_tracking_uri("https://dagshub.com/Qlsomlt/SMSL-Reyhan-Haidar.mlflow")
+          
+          client = MlflowClient()
+          
+          max_retries = 10
+          retry_delay = 3
+          
+          for attempt in range(max_retries):
+              try:
+                  exp = client.get_experiment_by_name("Logistic_Regression_Experiment")
+                  if not exp:
+                      raise Exception("Experiment not found")
+                  runs = client.search_runs(
+                      experiment_ids=[exp.experiment_id],
+                      order_by=["start_time DESC"],
+                      max_results=1
+                  )
+                  
+                  if runs:
+                      run_id = runs[0].info.run_id
+                      print(f"Found run ID: {run_id}")
+                      with open("run_id.txt", "w") as f:
+                          f.write(run_id)
+                      break
+                  else:
+                      raise Exception("No runs found in experiment")
+              except Exception as e:
+                  if attempt < max_retries - 1:
+                      print(f"Attempt {attempt + 1} failed: {e}. Retrying in {retry_delay}s...")
+                      time.sleep(retry_delay)
+                  else:
+                      raise
+          EOF
+
+      - name: Debug MLflow
+        shell: bash -l {0}
+        env:
+          MLFLOW_TRACKING_USERNAME: ${{ secrets.DAGSHUB_USERNAME }}
+          MLFLOW_TRACKING_PASSWORD: ${{ secrets.DAGSHUB_TOKEN }}
+        run: |
+          python -c "import mlflow; print(mlflow.get_tracking_uri())"    
+
+      - name: Show MLmodel
+        shell: bash -l {0}
+        env:
+          MLFLOW_TRACKING_USERNAME: ${{ secrets.DAGSHUB_USERNAME }}
+          MLFLOW_TRACKING_PASSWORD: ${{ secrets.DAGSHUB_TOKEN }}
+          # Menambahkan URI di step ini agar MLflow tahu dari mana model harus didownload
+          MLFLOW_TRACKING_URI: "https://dagshub.com/Qlsomlt/SMSL-Reyhan-Haidar.mlflow"
+        run: |
+          set -e
+          if [ ! -s run_id.txt ]; then
+            echo "run_id.txt not found or empty"
+            exit 1
+          fi
+          RUN_ID=$(cat run_id.txt)
+          echo "Using RUN_ID=$RUN_ID"
+          mlflow artifacts download \
+            -r "$RUN_ID" \
+            -a logistic_regression_model \
+            -d model
+          echo "===== MLmodel ====="
+          cat model/logistic_regression_model/MLmodel
+          echo "===== python_env.yaml ====="
+          cat model/logistic_regression_model/python_env.yaml
