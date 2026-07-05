@@ -22,7 +22,7 @@ from sklearn.metrics import (
 
 # Optional manual override (safe fallback)
 mlflow.set_tracking_uri(
-    "https://dagshub.com/Qlsomlt/SMSL-Reyhan-Haidar.mlflow"
+    "https://dagshub.com/Qlsomlt/SMSL_Reyhan-Haidar.mlflow"
 )
 
 mlflow.set_experiment("Logistic_Regression_Experiment_Tuning")
