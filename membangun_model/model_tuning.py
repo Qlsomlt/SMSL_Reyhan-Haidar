@@ -1,13 +1,14 @@
 import json
 import os
 from pathlib import Path
-
+import sys
 import dagshub
 import joblib
 import mlflow
 import mlflow.sklearn
 import pandas as pd
 import pickle
+sys.path.append(str(Path(__file__).resolve().parent.parent))
 from preprocessing_data.preprocessing import prepare_data
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import GridSearchCV

@@ -1,13 +1,13 @@
 import json
 import os
 from pathlib import Path
-
+import sys
 import dagshub
 import joblib
 import pandas as pd
 import mlflow
 import mlflow.sklearn
-
+sys.path.append(str(Path(__file__).resolve().parent.parent))
 from mlflow.tracking import MlflowClient
 from preprocessing_data.preprocessing import prepare_data
 
