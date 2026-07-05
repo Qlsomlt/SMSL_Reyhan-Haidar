@@ -23,12 +23,7 @@ from sklearn.metrics import (
 
 dagshub.init(repo_owner='Qlsomlt', repo_name='SMSL_Reyhan-Haidar', mlflow=True)
 
-# Optional manual override (safe fallback)
-mlflow.set_tracking_uri(
-    "https://dagshub.com/Qlsomlt/SMSL_Reyhan-Haidar.mlflow"
-)
 
-mlflow.set_experiment("Logistic_Regression_Experiment_Tuning")
 
 print("Tracking URI:", mlflow.get_tracking_uri())
 

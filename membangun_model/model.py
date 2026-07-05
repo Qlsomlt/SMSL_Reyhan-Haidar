@@ -21,7 +21,7 @@ from sklearn.metrics import (
     confusion_matrix,
 )
 
-dagshub.init(repo_owner='Qlsomlt', repo_name='SMSL_Reyhan-Haidar', mlflow=True)
+
 
 # =========================
 # PATH SETUP
@@ -39,11 +39,7 @@ PREDICTIONS_PATH = ARTIFACT_DIR / "predictions.csv"
 # Sekarang mengarah ke data_clean.csv di root directory
 CSV_PATH = BASE_DIR / "data_clean.csv"
 
-mlflow.set_tracking_uri(
-    "https://dagshub.com/Qlsomlt/SMSL_Reyhan-Haidar.mlflow"
-)
 
-print("Tracking URI:", mlflow.get_tracking_uri())
 
 # Set experiment AFTER tracking URI
 mlflow.set_experiment("Logistic_Regression_Experiment")
